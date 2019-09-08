@@ -1,49 +1,92 @@
-# Make Employee turn over using Decision Tree Model
+---
+title: "Make Employee turn over using Decision Tree Model"
+output: html_notebook
+Author : "Ferdiansyah"
+---
 
-## remove all variables (start from scratch)
+remove all variables (start from scratch)
+```{r}
+
 rm(list=ls())
 
-# Load library
+```
+
+Load library
+```{r}
 library(tidyverse)
 library(DataExplorer)
 library(rpart)
 library(rpart.plot)
 
-# Load dataset 
+```
+
+
+Load dataset 
+```{r}
 df_people <- read.csv("https://raw.githubusercontent.com/arikunco/machinelearning/master/dataset/HR_comma_sep.csv",stringsAsFactors = T)
 levels(df_people$sales)
-#membuat urutan kategori pada gaji
+
+```
+membuat urutan kategori pada gaji
+```{r}
 levels(df_people$salary) <- c("low","medium","high")
 levels(df_people$salary)
-
-# Preview first six rows
+```
+Preview first six rows
+```{r}
 head(df_people)
+```
 
-# Preview last six rows 
+Preview last six rows 
+```{r}
+
 tail(df_people) 
 
-# Column Names 
+```
+
+Column Names 
+```{r}
 names(df_people)
 
-# Data type per columns 
+```
+
+Data type per columns 
+```{r}
 str(df_people)
 
-# Statistic Description
+```
+Statistic Description
+```{r}
 summary(df_people)
 
-# check missing value 
+```
+
+check missing value 
+```{r}
 plot_missing(df_people)
+
+```
+
 
 # Visualize data 
 
-# histogram of satisfaction level by Left 
+histogram of satisfaction level by Left 
+```{r}
 df_people$left <- as.factor(df_people$left)
 ggplot(df_people) + geom_histogram(aes(x=satisfaction_level,color=left), fill="White",alpha=0.5, bins = 30,position="identity")
 
-# histogram of last evluation by Left 
+```
+
+
+histogram of last evluation by Left 
+```{r}
 ggplot(df_people) + geom_histogram(aes(x=last_evaluation,color=left), fill="White",alpha=0.5, bins = 30,position="identity")
 
-# barchart of Number Project Vs Left
+```
+
+
+barchart of Number Project Vs Left
+```{r}
 counts <- table(df_people[,c('left','number_project')])
 counts
 barplot(counts, main="Number of Project vs Left",
@@ -55,16 +98,23 @@ propcount
 barplot(propcount, main="Number Project vs Left",
         xlab="Number of Project", col=c("darkblue","red"),legend = rownames(counts))
 
+```
 
-# histogram of Monthly Hour by Left 
+
+
+histogram of Monthly Hour by Left 
+```{r}
 ggplot(df_people) + geom_histogram(aes(x=average_montly_hours,color=left), fill="White",alpha=0.5, bins = 30,position="identity")
 
-# barchart of Work Accident Vs Left
+```
+
+
+barchart of Work Accident Vs Left
+```{r}
 counts <- table(df_people[,c('left','Work_accident')])
 counts
 barplot(counts, main="Work Accident vs Left",
         xlab="Work Accident", col=c("darkblue","red"),legend = rownames(counts), beside=TRUE)
-
 # stackbarchart of Work Accident by Left
 propcount <- prop.table(counts)
 propcount
@@ -72,7 +122,11 @@ barplot(propcount, main=" Work Accident vs Left",
         xlab="Work Accident", col=c("darkblue","red"),legend = rownames(counts))
 
 
-# Table crosstab of promotion by left 
+```
+
+Table crosstab of promotion by left 
+```{r}
+
 counts <- table(df_people$promotion_last_5years, df_people$left)
 counts
 barplot(counts, main="Promotion last 5 years vs Left",
@@ -83,8 +137,12 @@ propcount
 barplot(propcount, main="promotion vs Left",
         xlab="Promotion", col=c("darkblue","red"),legend = rownames(counts))
 
+```
 
-# barchart of Salary by Left 
+
+barchart of Salary by Left 
+```{r}
+
 counts <- table(df_people[,c('left','salary')])
 counts
 barplot(counts, main="Salary Distribution vs Left",
@@ -96,50 +154,88 @@ propcount
 barplot(propcount, main="Salary Distribution vs Left",
         xlab="Salary", col=c("darkblue","red"),legend = rownames(counts))
 
+```
+
 
 # Membuat Model
 
-# membuat random sampling dengan index yang sama dalam setiap program di run
+membuat random sampling dengan index yang sama dalam setiap program di run
+```{r}
 set.seed(123)
 
-## 80% of the sample size
+```
+
+80% of the sample size
+```{r}
+
 smp_size <- floor(0.8 * nrow(df_people))
 
-## membuat index dari data training
+```
+
+membuat index dari data training
+```{r}
 train_ind <- sample(seq_len(nrow(df_people)), size = smp_size)
 
-## Membuat data training
+```
+Membuat data training
+```{r}
+
 train <- df_people[train_ind, ]
 dim(train)
 head(train)
 
-## Membuat data test
+```
+
+Membuat data test
+```{r}
 test <- df_people[-train_ind, ]
 dim(test)
 head(test)
 
-## meihat proporsi left pada data test dan data training
+```
+
+meihat proporsi left pada data test dan data training
+```{r}
 prop.table(table(train$left))
 prop.table(table(test$left))
+```
 
+## Decision Tree Model
+```{r}
 fit <- rpart(left ~.,data = train,
              method="class"
 )
-
-## Decision Tree Model
 summary(fit)
+
+```
+## Plot Decesion Tree
+```{r}
 rpart.plot(fit)
 
+```
+
 ## Validation Models
+```{r}
 predict_unseen <-predict(fit, test, type = 'class')
 table_mat <- table(test$left, predict_unseen)
 
+```
+
+
 ## Confusion Matrix
+```{r}
 table_mat
 
+```
+
+
 ## Acuracy Test
+```{r}
 accuracy_Test <- sum(diag(table_mat)) / sum(table_mat)
 print(paste('Accuracy for test', accuracy_Test))
+
+```
+
 
 
 
