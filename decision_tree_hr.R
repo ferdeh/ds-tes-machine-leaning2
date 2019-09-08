@@ -127,6 +127,7 @@ fit <- rpart(left ~.,data = train,
 )
 
 ## Decision Tree Model
+fit
 summary(fit)
 rpart.plot(fit)
 
@@ -141,5 +142,17 @@ table_mat
 accuracy_Test <- sum(diag(table_mat)) / sum(table_mat)
 print(paste('Accuracy for test', accuracy_Test))
 
+library(randomForest) # package yang memuat fungsi randomForest
+randomFor <- randomForest(left ~ ., data = train, ntree=500, importance = TRUE)
+predict(randomFor, test,type="class")
+table_mat2<-table(test$left,predict(randomFor, test, type="class"))
+prop.table(table(test$left,predict(randomFor, test, type="class")))
+
+## Confusion Matrix
+table_mat2
+
+## Acuracy Test
+accuracy_Test <- sum(diag(table_mat2)) / sum(table_mat2)
+print(paste('Accuracy for test', accuracy_Test))
 
 
