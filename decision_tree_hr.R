@@ -142,6 +142,8 @@ table_mat
 accuracy_Test <- sum(diag(table_mat)) / sum(table_mat)
 print(paste('Accuracy for test', accuracy_Test))
 
+# Random Forest
+
 library(randomForest) # package yang memuat fungsi randomForest
 randomFor <- randomForest(left ~ ., data = train, ntree=500, importance = TRUE)
 predict(randomFor, test,type="class")
